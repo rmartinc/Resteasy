@@ -200,4 +200,7 @@ public interface Messages
 
    @Message(id = BASE + 300, value = "Verification succeeded!")
    String verificationSucceeded();
+
+   @Message(id = BASE + 305, value = "Access code invalid")
+   String accessCodeInvalid();
 }

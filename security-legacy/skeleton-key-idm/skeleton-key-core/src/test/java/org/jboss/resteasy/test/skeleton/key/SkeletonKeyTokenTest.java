@@ -71,7 +71,7 @@ public class SkeletonKeyTokenTest
 
       LOG.info(encoded);
 
-      JWSInput input = new JWSInput(encoded);
+      JWSInput input = new JWSInput(encoded, null);
       byte[] content = input.getContent();
 
       token = JsonSerialization.fromBytes(SkeletonKeyToken.class, content);

@@ -16,6 +16,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.jose.jws.JWSBuilder;
 import org.jboss.resteasy.jose.jws.JWSInput;
+import org.jboss.resteasy.jose.jws.JWSInputException;
 import org.jboss.resteasy.jose.jws.crypto.RSAProvider;
 import org.jboss.resteasy.jwt.JsonSerialization;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -740,11 +741,22 @@ public class OAuthAuthenticationServerValve extends FormAuthenticator implements
       // always verify code and remove access code from map before authenticating user
       // if user authentication fails, we want the code to be removed irreguardless just in case we're under attack
       String code = request.getParameter("code");
-      JWSInput input = new JWSInput(code, providers);
+      JWSInput input = null;
+      try
+      {
+         input = new JWSInput(code, providers);
+      }
+      catch (JWSInputException ignored)
+      {
+          LogMessages.LOGGER.error(Messages.MESSAGES.accessCodeInvalid(), ignored);
+      }
       boolean verifiedCode = false;
       try
       {
-         verifiedCode = RSAProvider.verify(input, realmPublicKey);
+         if (input != null)
+         {
+            verifiedCode = RSAProvider.verify(input, realmPublicKey);
+         }
       }
       catch (Exception ignored)
       {

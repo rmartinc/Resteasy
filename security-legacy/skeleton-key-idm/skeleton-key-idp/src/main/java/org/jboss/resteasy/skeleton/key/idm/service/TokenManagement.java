@@ -3,6 +3,7 @@ package org.jboss.resteasy.skeleton.key.idm.service;
 import org.jboss.resteasy.jose.Base64Url;
 import org.jboss.resteasy.jose.jws.JWSBuilder;
 import org.jboss.resteasy.jose.jws.JWSInput;
+import org.jboss.resteasy.jose.jws.JWSInputException;
 import org.jboss.resteasy.jose.jws.crypto.RSAProvider;
 import org.jboss.resteasy.jwt.JsonSerialization;
 import org.jboss.resteasy.logging.Logger;
@@ -351,12 +352,22 @@ public class TokenManagement
       }
 
 
+      JWSInput input = null;
+      try
+      {
+         input = new JWSInput(code, providers);
+      }
+      catch (JWSInputException ignored) {
+          LogMessages.LOGGER.debug(Messages.MESSAGES.accessCodeInvalid(), ignored);
+      }
 
-      JWSInput input = new JWSInput(code, providers);
       boolean verifiedCode = false;
       try
       {
-         verifiedCode = RSAProvider.verify(input, realm.getPublicKey());
+         if (input != null)
+         {
+            verifiedCode = RSAProvider.verify(input, realm.getPublicKey());
+         }
       }
       catch (Exception ignored)
       {

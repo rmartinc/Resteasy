@@ -168,4 +168,7 @@ public interface Messages
 
    @Message(id = BASE + 250, value = "You are not authorized for the requested scope.")
    String youAreNotAuthorizedForRequestedScope();
+
+   @Message(id = BASE + 255, value = "Access code invalid")
+   String accessCodeInvalid();
 }

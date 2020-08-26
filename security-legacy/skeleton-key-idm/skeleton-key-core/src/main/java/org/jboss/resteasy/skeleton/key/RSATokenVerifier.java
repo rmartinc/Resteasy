@@ -1,6 +1,7 @@
 package org.jboss.resteasy.skeleton.key;
 
 import org.jboss.resteasy.jose.jws.JWSInput;
+import org.jboss.resteasy.jose.jws.JWSInputException;
 import org.jboss.resteasy.jose.jws.crypto.RSAProvider;
 import org.jboss.resteasy.jwt.JsonSerialization;
 import org.jboss.resteasy.skeleton.key.i18n.Messages;
@@ -20,7 +21,14 @@ public class RSATokenVerifier
       PublicKey realmKey = metadata.getRealmKey();
       String realm = metadata.getRealm();
       String resource = metadata.getResourceName();
-      JWSInput input = new JWSInput(tokenString);
+      JWSInput input = null;
+      try
+      {
+         input = new JWSInput(tokenString, null);
+      } catch (JWSInputException e)
+      {
+         throw new VerificationException(e);
+      }
       boolean verified = false;
       try
       {
