@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -550,8 +551,8 @@ public class MediaTypeMap<T>
       CachedMediaTypeAndClass cacheEntry = null;
       if (useCache)
       {
+         cacheEntry = new CachedMediaTypeAndClass(type, accept);
          if (classCache != null) {
-            cacheEntry = new CachedMediaTypeAndClass(type, accept);
             cached = classCache.get(cacheEntry);
             if (cached != null) return cached;
          }
@@ -576,14 +577,14 @@ public class MediaTypeMap<T>
       cached = convert(matches);
       if (useCache) {
          Map<CachedMediaTypeAndClass, List<T>> cache = classCache;
-         if (classCache == null) {
+         if (cache == null) {
             synchronized (this)
             {
                if (classCache == null)
                {
-                  cache = new HashMap<>();
-                  classCache = cache;
+                  classCache = new ConcurrentHashMap<>();
                }
+               cache = classCache;
             }
          }
          cache.put(cacheEntry, cached);
